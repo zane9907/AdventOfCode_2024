@@ -1,10 +1,16 @@
-﻿namespace AdventOfCode_06
+﻿using System.Numerics;
+
+namespace AdventOfCode_06
 {
     internal class Program
     {
         static List<List<char>> map = [];
         static List<List<char>> loops = [];
         static int obstruction = 0;
+        static bool validLoop = false;
+        static bool guardLeft = false;
+        static int turns = 0;
+
         static (int pos1, int pos2) guardPositon = (-1, -1);
 
         static void Main(string[] args)
@@ -40,9 +46,119 @@
                 }
             }
 
-            bool guardLeft = false;
-            while (!guardLeft/* && i < data.Count || i >= 0 || j < data[i].Length || j >= 0*/)
+            int obstacleX = 0;
+            int obstacleY = 0;
+            //while (!guardLeft)
+            //{
+            //    if (map[obstacleX][obstacleY] != '#')
+            //    {
+            //        map[obstacleX][obstacleY] = 'O';
+            //    }
+            //    char guard = map[i][j];
+            //    switch (map[i][j])
+            //    {
+            //        case '^':
+            //            {
+            //                if (MoveUp(ref i, ref j))
+            //                {
+            //                    guardLeft = true;
+            //                    continue;
+            //                }
+            //                break;
+            //            }
+            //        case '>':
+            //            {
+            //                if (MoveRight(ref i, ref j))
+            //                {
+            //                    guardLeft = true;
+            //                    continue;
+            //                }
+            //                break;
+            //            }
+            //        case 'V':
+            //            {
+            //                if (MoveDown(ref i, ref j))
+            //                {
+            //                    guardLeft = true;
+            //                    continue;
+            //                }
+            //                break;
+            //            }
+            //        case '<':
+            //            {
+            //                if (MoveLeft(ref i, ref j))
+            //                {
+            //                    guardLeft = true;
+            //                    continue;
+            //                }
+            //                break;
+            //            }
+            //    }
+
+            //    Console.Clear();
+            //    for (int r = 0; r < map.Count; r++)
+            //    {
+            //        for (int c = 0; c < map[r].Count; c++)
+            //        {
+            //            Console.Write(map[r][c]);
+            //        }
+            //        Console.WriteLine();
+            //    }
+            //}
+
+
+            //map[i][j] = 'X';
+
+            int visited = 0;
+
+            //for (int r = 0; r < map.Count; r++)
+            //{
+            //    for (int c = 0; c < map[r].Count; c++)
+            //    {
+            //        if (map[r][c] == 'X')
+            //        {
+            //            visited++;
+            //        }
+            //        Console.Write(map[r][c]);
+            //    }
+            //    Console.WriteLine();
+            //}
+
+            List<string> places = [];
+            i = guardPositon.pos1;
+            j = guardPositon.pos2;
+            while (obstacleX < map.Count && obstacleY < map.Count)
             {
+
+                if (map[obstacleX][obstacleY] != '#')
+                {
+                    if (obstacleX == guardPositon.pos1 && obstacleY == guardPositon.pos2)
+                    {
+                        map.Clear();
+                        for (int k = 0; k < data.Length; k++)
+                        {
+                            map.Add([.. data[k]]);
+                        }
+
+                        i = guardPositon.pos1;
+                        j = guardPositon.pos2;
+
+                        validLoop = false;
+                        guardLeft = false;
+                        obstacleY++;
+                        if (obstacleY == map[0].Count)
+                        {
+                            obstacleX++;
+                            obstacleY = 0;
+                        }
+
+                        continue;
+                    }
+                    else
+                    {
+                        map[obstacleX][obstacleY] = '#';
+                    }
+                }
                 char guard = map[i][j];
                 switch (map[i][j])
                 {
@@ -50,8 +166,7 @@
                         {
                             if (MoveUp(ref i, ref j))
                             {
-                                guardLeft = true;
-                                continue;
+                                validLoop = true;
                             }
                             break;
                         }
@@ -59,8 +174,7 @@
                         {
                             if (MoveRight(ref i, ref j))
                             {
-                                guardLeft = true;
-                                continue;
+                                validLoop = true;
                             }
                             break;
                         }
@@ -68,8 +182,7 @@
                         {
                             if (MoveDown(ref i, ref j))
                             {
-                                guardLeft = true;
-                                continue;
+                                validLoop = true;
                             }
                             break;
                         }
@@ -77,54 +190,80 @@
                         {
                             if (MoveLeft(ref i, ref j))
                             {
-                                guardLeft = true;
-                                continue;
+                                validLoop = true;
                             }
                             break;
                         }
                 }
 
-                Console.Clear();
-                for (int r = 0; r < map.Count; r++)
+
+
+                if (validLoop)
                 {
-                    for (int c = 0; c < map[r].Count; c++)
+                    map.Clear();
+                    for (int k = 0; k < data.Length; k++)
                     {
-                        Console.Write(map[r][c]);
+                        map.Add([.. data[k]]);
                     }
-                    Console.WriteLine();
-                }
-                var asd = obstruction;
-            }
 
-            map[i][j] = 'X';
+                    obstruction++;
+                    places.Add($"{obstacleX}#{obstacleY}");
+                    validLoop = false;
+                    guardLeft = false;
+                    i = guardPositon.pos1;
+                    j = guardPositon.pos2;
 
-            int visited = 0;
+                    turns = 0;
+                    obstacleY++;
 
-            for (int r = 0; r < map.Count; r++)
-            {
-                for (int c = 0; c < map[r].Count; c++)
-                {
-                    if (map[r][c] == 'X')
+                    if (obstacleY == map[0].Count)
                     {
-                        visited++;
+                        obstacleX++;
+                        obstacleY = 0;
                     }
-                    Console.Write(map[r][c]);
                 }
-                Console.WriteLine();
-            }
-
-            Console.Clear();
-
-            for (int r = 0; r < loops.Count; r++)
-            {
-                for (int c = 0; c < loops[r].Count; c++)
+                if (guardLeft)
                 {
-                    Console.Write(loops[r][c]);
+                    map.Clear();
+                    for (int k = 0; k < data.Length; k++)
+                    {
+                        map.Add([.. data[k]]);
+                    }
+
+                    i = guardPositon.pos1;
+                    j = guardPositon.pos2;
+                    turns = 0;
+
+                    validLoop = false;
+                    guardLeft = false;
+                    obstacleY++;
+                    if (obstacleY == map[0].Count)
+                    {
+                        obstacleX++;
+                        obstacleY = 0;
+                    }
                 }
-                Console.WriteLine();
+
+
+
+
+                //Console.SetCursorPosition(0, 0);
+                //for (int r = 0; r < map.Count; r++)
+                //{
+                //    for (int c = 0; c < map[r].Count; c++)
+                //    {
+                //        Console.Write(map[r][c]);
+                //    }
+                //    Console.WriteLine();
+                //}
+                //Console.WriteLine(); Console.WriteLine("obstructions: " + obstruction);
+                //foreach (var item in places)
+                //{
+                //    Console.WriteLine(item);
+                //}
+                //Thread.Sleep(5);
+                ;
             }
-
-
 
 
             ;
@@ -134,7 +273,8 @@
         {
             if (i - 1 < 0)
             {
-                return true;
+                guardLeft = true;
+                return false;
             }
 
             if (map[i - 1][j] == '.' || map[i - 1][j] == 'X')
@@ -142,11 +282,18 @@
                 map[i][j] = 'X';
                 i--;
 
-                if (map[i][j] != 'X' && map[i][j + 1] == 'X' && (i != guardPositon.pos1 ^ j + 1 != guardPositon.pos2))
+                //if (i - 1 >= 0 && map[i - 1][j] == 'O' && map[i][j + 1] == 'X')
+                //{
+                //    if (ValidateLoop(i, j, '>'))
+                //    {
+                //        return true;
+                //    }
+                //}
+                turns++;
+                if (turns > 7000)
                 {
-                    obstruction++;
+                    return true;
                 }
-
                 map[i][j] = '^';
             }
             else
@@ -161,7 +308,8 @@
         {
             if (j + 1 >= map[i].Count)
             {
-                return true;
+                guardLeft = true;
+                return false;
             }
 
             if (map[i][j + 1] == '.' || map[i][j + 1] == 'X')
@@ -169,12 +317,20 @@
                 map[i][j] = 'X';
                 j++;
 
-                if (map[i][j] != 'X' && map[i + 1][j] == 'X' && (i + 1 != guardPositon.pos1 ^ j != guardPositon.pos2))
-                {
-                    obstruction++;
-                }
+                //if (j + 1 < map[0].Count && map[i][j + 1] == 'O' && map[i + 1][j] == 'X')
+                //{
+                //    if (ValidateLoop(i, j, 'V'))
+                //    {
+                //        return true;
+                //    }
+                //}
 
                 map[i][j] = '>';
+                turns++;
+                if (turns > 7000)
+                {
+                    return true;
+                }
             }
             else
             {
@@ -188,7 +344,8 @@
         {
             if (i + 1 >= map.Count)
             {
-                return true;
+                guardLeft = true;
+                return false;
             }
 
             if (map[i + 1][j] == '.' || map[i + 1][j] == 'X')
@@ -196,12 +353,20 @@
                 map[i][j] = 'X';
                 i++;
 
-                if (map[i][j] != 'X' && map[i][j - 1] == 'X' && (i != guardPositon.pos1 ^ j - 1 != guardPositon.pos2))
-                {
-                    obstruction++;
-                }
+                //if (i + 1 < map.Count && map[i + 1][j] == 'O' && map[i][j - 1] == 'X')
+                //{
+                //    if (ValidateLoop(i, j, '<'))
+                //    {
+                //        return true;
+                //    }
+                //}
 
                 map[i][j] = 'V';
+                turns++;
+                if (turns > 7000)
+                {
+                    return true;
+                }
             }
             else
             {
@@ -215,24 +380,146 @@
         {
             if (j - 1 < 0)
             {
-                return true;
+                guardLeft = true;
+                return false;
             }
-            //TODO loop validation with turns
+
             if (map[i][j - 1] == '.' || map[i][j - 1] == 'X')
             {
                 map[i][j] = 'X';
                 j--;
 
-                if (map[i][j - 1] != 'X' && map[i - 1][j] == 'X' && (i - 1 != guardPositon.pos1 ^ j != guardPositon.pos2))
-                {
-                    obstruction++;
-                }
+                //if (j - 1 >= 0 && map[i][j - 1] == 'O' && map[i - 1][j] == 'X')
+                //{
+                //    if (ValidateLoop(i, j, '^'))
+                //    {
+                //        return true;
+                //    }
+                //}
 
                 map[i][j] = '<';
+                turns++;
+                if (turns > 7000)
+                {
+                    return true;
+                }
             }
             else
             {
                 map[i][j] = '^';
+            }
+
+            return false;
+        }
+
+
+        static bool ValidateLoop(int i, int j, char direction)
+        {
+            int startPosX = i;
+            int startPosY = j;
+
+            int localTurns = 0;
+            int Ohit = 0;
+            while (i >= 0 || j >= 0 || i < map.Count || j < map[i].Count)
+            {
+                switch (direction)
+                {
+                    case '^':
+                        {
+                            if (i - 1 < 0)
+                            {
+                                return false;
+                            }
+
+                            if (map[i - 1][j] == 'X')
+                            {
+                                i--;
+                            }
+                            else
+                            {
+                                if (map[i - 1][j] == 'O')
+                                {
+                                    Ohit++;
+                                }
+                                localTurns++;
+                                direction = '>';
+                            }
+                            break;
+                        }
+                    case '>':
+                        {
+                            if (j + 1 >= map[i].Count)
+                            {
+                                return false;
+                            }
+
+                            if (map[i][j + 1] == 'X')
+                            {
+                                j++;
+                            }
+                            else
+                            {
+                                if (map[i][j + 1] == 'O')
+                                {
+                                    Ohit++;
+                                }
+                                localTurns++;
+                                direction = 'V';
+                            }
+                            break;
+                        }
+                    case 'V':
+                        {
+                            if (i + 1 >= map.Count)
+                            {
+                                return false;
+                            }
+
+                            if (map[i + 1][j] == 'X')
+                            {
+                                i++;
+                            }
+                            else
+                            {
+                                if (map[i + 1][j] == 'O')
+                                {
+                                    Ohit++;
+                                }
+                                localTurns++;
+                                direction = '<';
+                            }
+                            break;
+                        }
+                    case '<':
+                        {
+                            if (j - 1 < 0)
+                            {
+                                return false;
+                            }
+
+                            if (map[i][j - 1] == 'X')
+                            {
+                                j--;
+                            }
+                            else
+                            {
+                                if (map[i][j - 1] == 'O')
+                                {
+                                    Ohit++;
+                                }
+                                localTurns++;
+                                direction = '^';
+                            }
+                            break;
+                        }
+                    default:
+                        break;
+                }
+
+                if (Ohit > 20)
+                {
+                    return true;
+                }
             }
 
             return false;
