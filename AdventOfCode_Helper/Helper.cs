@@ -12,9 +12,20 @@
             return File.ReadAllText(path);
         }
 
-        public static List<int> ReadFileIntList(string path)
+        public static List<int> ReadFileLinesIntList(string path)
         {
             return File.ReadAllLines(path).ToList().ConvertAll(int.Parse);
+        }
+        public static List<int> ReadFileTextIntList(string path)
+        {
+            string data = File.ReadAllText(path);
+            List<int> result = [];
+            foreach (char num in data)
+            {
+                result.Add(num - '0');
+            }
+
+            return result;
         }
 
         public static List<string> ReadFileStringList(string path)
