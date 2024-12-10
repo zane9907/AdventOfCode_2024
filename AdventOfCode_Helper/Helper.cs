@@ -28,6 +28,21 @@
             return result;
         }
 
+        public static List<List<int>> ReadFileIntMatrix(string path)
+        {
+            string[] data = File.ReadAllLines(path);
+            List<List<int>> result = [];
+            foreach (string row in data)
+            {
+                result.Add(row.ToList().ConvertAll(x =>
+                {
+                    return x - '0';
+                }));
+            }
+
+            return result;
+        }
+
         public static List<string> ReadFileStringList(string path)
         {
             return File.ReadAllLines(path).ToList();
