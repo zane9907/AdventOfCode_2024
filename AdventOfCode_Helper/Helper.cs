@@ -7,6 +7,11 @@
             return File.ReadAllLines(path);
         }
 
+        public static string[] ReadFileStringArraySplit(string path)
+        {
+            return File.ReadAllText(path).Split(' ');
+        }
+
         public static string ReadFileString(string path)
         {
             return File.ReadAllText(path);
