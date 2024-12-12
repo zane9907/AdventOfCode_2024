@@ -1,4 +1,5 @@
 ﻿using AdventOfCode_Helper;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace AdventOfCode12
@@ -47,7 +48,11 @@ namespace AdventOfCode12
                 price += plot.Area * plot.Perimeter;
             }
 
-
+            int price2 = 0;
+            foreach (Plot plot in garden)
+            {
+                price2 += plot.Area * plot.Sides;
+            }
 
         }
 
@@ -58,7 +63,9 @@ namespace AdventOfCode12
             for (int r = 0; r < rows.Count - 1; r++)
             {
                 int item = rows[r];
-                List<(int x, int y)> row = region.Where(pos => pos.x == item).ToList();
+                List<(int x, int y)> row = region.Where(pos => pos.x == item)
+                                                 .OrderBy(pos => pos.y)
+                                                 .ToList();
 
                 bool isConsistent1 = true;
                 for (int i = 0; i < row.Count - 1; i++)
@@ -70,7 +77,7 @@ namespace AdventOfCode12
                     }
                 }
 
-
+                //Delete consistent
                 if (isConsistent1)
                 {
                     var first = row[0];
@@ -80,20 +87,32 @@ namespace AdventOfCode12
                     {
                         sides++;
                     }
+                    //UP Last
+                    else if (last.x - 1 < 0 || map[last.x - 1][last.y] != id)
+                    {
+                        sides++;
+                    }
+
                     //DOWN first
                     if (first.x + 1 >= map.Count || map[first.x + 1][first.y] != id)
                     {
                         sides++;
                     }
                     //LEFT first
-                    if (first.y - 1 < 0 || map[first.x][first.y - 1] != id)
+                    if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).First().y != first.y)
                     {
-                        sides++;
+                        if (first.y - 1 < 0 || map[first.x][first.y - 1] != id)
+                        {
+                            sides++;
+                        }
                     }
                     //RIGHT last
-                    if (last.y + 1 >= map[0].Count || map[last.x][last.y + 1] != id)
+                    if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).Last().y != last.y)
                     {
-                        sides++;
+                        if (last.y + 1 >= map[0].Count || map[last.x][last.y + 1] != id)
+                        {
+                            sides++;
+                        }
                     }
                     //DOWN last
                     if (last.x + 1 >= map.Count || map[last.x + 1][last.y] != id)
@@ -126,14 +145,20 @@ namespace AdventOfCode12
                             sides++;
                         }
                         //LEFT
-                        if (pos.y - 1 < 0 || map[pos.x][pos.y - 1] != id)
+                        if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).First().y != pos.y)
                         {
-                            sides++;
+                            if (pos.y - 1 < 0 || map[pos.x][pos.y - 1] != id)
+                            {
+                                sides++;
+                            }
                         }
                         //RIGHT
-                        if (pos.y + 1 >= map[0].Count || map[pos.x][pos.y + 1] != id)
+                        if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).Last().y != pos.y)
                         {
-                            sides++;
+                            if (pos.y + 1 >= map[0].Count || map[pos.x][pos.y + 1] != id)
+                            {
+                                sides++;
+                            }
                         }
                     }
                 }
@@ -165,14 +190,20 @@ namespace AdventOfCode12
                     sides++;
                 }
                 //LEFT first
-                if (first.y - 1 < 0 || map[first.x][first.y - 1] != id)
+                if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).First().y != first.y)
                 {
-                    sides++;
+                    if (first.y - 1 < 0 || map[first.x][first.y - 1] != id)
+                    {
+                        sides++;
+                    }
                 }
                 //RIGHT last
-                if (last.y + 1 >= map[0].Count || map[last.x][last.y + 1] != id)
+                if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).Last().y != last.y)
                 {
-                    sides++;
+                    if (last.y + 1 >= map[0].Count || map[last.x][last.y + 1] != id)
+                    {
+                        sides++;
+                    }
                 }
             }
             else
@@ -190,19 +221,25 @@ namespace AdventOfCode12
                         sides++;
                     }
                     //LEFT
-                    if (item.y - 1 < 0 || map[item.x][item.y - 1] != id)
+                    if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).First().y != item.y)
                     {
-                        sides++;
+                        if (item.y - 1 < 0 || map[item.x][item.y - 1] != id)
+                        {
+                            sides++;
+                        }
                     }
                     //RIGHT
-                    if (item.y + 1 >= map[0].Count || map[item.x][item.y + 1] != id)
+                    if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).Last().y != item.y)
                     {
-                        sides++;
+                        if (item.y + 1 >= map[0].Count || map[item.x][item.y + 1] != id)
+                        {
+                            sides++;
+                        }
                     }
-                } 
+                }
             }
 
-            
+
 
             return sides;
         }
