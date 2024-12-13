@@ -59,189 +59,123 @@ namespace AdventOfCode12
         static int CalculateSides(List<(int x, int y)> region, char id)
         {
             int sides = 0;
-            List<int> rows = region.Select(pos => pos.x).Distinct().ToList();
-            for (int r = 0; r < rows.Count - 1; r++)
+
+
+            Dictionary<string, List<(int x, int y)>> directionSide = new()
             {
-                int item = rows[r];
-                List<(int x, int y)> row = region.Where(pos => pos.x == item)
+                {"UP", [] },
+                {"RIGHT", [] },
+                {"DOWN", [] },
+                {"LEFT", [] }
+            };
+
+            List<int> rows = region.Select(pos => pos.x).Distinct().OrderBy(x => x).ToList();
+             
+            foreach (var rowNumber in rows)
+            {
+                List<(int x, int y)> row = region.Where(pos => pos.x == rowNumber)
                                                  .OrderBy(pos => pos.y)
                                                  .ToList();
 
-                bool isConsistent1 = true;
-                for (int i = 0; i < row.Count - 1; i++)
-                {
-                    if (row[i + 1].y - row[i].y != 1)
-                    {
-                        isConsistent1 = false;
-                        break;
-                    }
-                }
-
-                //Delete consistent
-                if (isConsistent1)
-                {
-                    var first = row[0];
-                    var last = row[^1];
-                    //UP first
-                    if (first.x - 1 < 0 || map[first.x - 1][first.y] != id)
-                    {
-                        sides++;
-                    }
-                    //UP Last
-                    else if (last.x - 1 < 0 || map[last.x - 1][last.y] != id)
-                    {
-                        sides++;
-                    }
-
-                    //DOWN first
-                    if (first.x + 1 >= map.Count || map[first.x + 1][first.y] != id)
-                    {
-                        sides++;
-                    }
-                    //LEFT first
-                    if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).First().y != first.y)
-                    {
-                        if (first.y - 1 < 0 || map[first.x][first.y - 1] != id)
-                        {
-                            sides++;
-                        }
-                    }
-                    //RIGHT last
-                    if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).Last().y != last.y)
-                    {
-                        if (last.y + 1 >= map[0].Count || map[last.x][last.y + 1] != id)
-                        {
-                            sides++;
-                        }
-                    }
-                    //DOWN last
-                    if (last.x + 1 >= map.Count || map[last.x + 1][last.y] != id)
-                    {
-                        sides++;
-                    }
-                }
-                else
-                {
-                    var first = row[0];
-                    var last = row[^1];
-                    //DOWN first
-                    if (first.x + 1 >= map.Count || map[first.x + 1][first.y] != id)
-                    {
-                        sides++;
-                    }
-
-                    //DOWN last
-                    if (last.x + 1 >= map.Count || map[last.x + 1][last.y] != id)
-                    {
-                        sides++;
-                    }
-
-                    for (int o = 0; o < row.Count; o++)
-                    {
-                        (int x, int y) pos = row[o];
-                        //UP
-                        if (pos.x - 1 < 0 || map[pos.x - 1][pos.y] != id)
-                        {
-                            sides++;
-                        }
-                        //LEFT
-                        if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).First().y != pos.y)
-                        {
-                            if (pos.y - 1 < 0 || map[pos.x][pos.y - 1] != id)
-                            {
-                                sides++;
-                            }
-                        }
-                        //RIGHT
-                        if (r == 0 || r - 1 >= 0 && region.Where(pos => pos.x == rows[r - 1]).OrderBy(pos => pos.y).Last().y != pos.y)
-                        {
-                            if (pos.y + 1 >= map[0].Count || map[pos.x][pos.y + 1] != id)
-                            {
-                                sides++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            List<(int x, int y)> lastRow = region.Where(pos => pos.x == rows[^1]).ToList();
-            bool isConsistent = true;
-            for (int i = 0; i < lastRow.Count - 1; i++)
-            {
-                if (lastRow[i + 1].y - lastRow[i].y != 1)
-                {
-                    isConsistent = false;
-                    break;
-                }
-            }
-
-            if (isConsistent)
-            {
-                var first = lastRow[0];
-                var last = lastRow[^1];
-                //UP first
-                if (first.x - 1 < 0 || map[first.x - 1][first.y] != id)
-                {
-                    sides++;
-                }
-                //DOWN first
-                if (first.x + 1 >= map.Count || map[first.x + 1][first.y] != id)
-                {
-                    sides++;
-                }
-                //LEFT first
-                if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).First().y != first.y)
-                {
-                    if (first.y - 1 < 0 || map[first.x][first.y - 1] != id)
-                    {
-                        sides++;
-                    }
-                }
-                //RIGHT last
-                if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).Last().y != last.y)
-                {
-                    if (last.y + 1 >= map[0].Count || map[last.x][last.y + 1] != id)
-                    {
-                        sides++;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var item in lastRow)
+                for (int i = 0; i < row.Count; i++)
                 {
                     //UP
-                    if (item.x - 1 < 0 || map[item.x - 1][item.y] != id)
+                    if (row[i].x - 1 < 0 || map[row[i].x - 1][row[i].y] != id)
                     {
-                        sides++;
-                    }
-                    //DOWN
-                    if (item.x + 1 >= map.Count || map[item.x + 1][item.y] != id)
-                    {
-                        sides++;
-                    }
-                    //LEFT
-                    if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).First().y != item.y)
-                    {
-                        if (item.y - 1 < 0 || map[item.x][item.y - 1] != id)
+                        var positions = directionSide["UP"];
+                        List<(int x, int y)> lastSide = positions.Where(pos => pos.x == row[i].x - 1).ToList();
+                        if (lastSide.Count == 0)
                         {
-                            sides++;
+                            lastSide.Add((-99999, -99999));
+                        }
+
+                        if (positions.Count == 0
+                            || row[i].y - lastSide.Last().y > 1)
+                        {
+                            positions.Add((row[i].x - 1, row[i].y));
+                        }
+                        else
+                        {
+                            var index = positions.FindIndex(x => x == lastSide[^1]);
+                            positions[index] = (row[i].x - 1, row[i].y);
                         }
                     }
                     //RIGHT
-                    if (rows.Count == 1 || region.Where(pos => pos.x == rows[rows.Count - 2]).OrderBy(pos => pos.y).Last().y != item.y)
+                    if (row[i].y + 1 >= map[0].Count || map[row[i].x][row[i].y + 1] != id)
                     {
-                        if (item.y + 1 >= map[0].Count || map[item.x][item.y + 1] != id)
+                        var positions = directionSide["RIGHT"];
+                        List<(int x, int y)> lastSide = positions.Where(pos => pos.y == row[i].y + 1).ToList();
+                        if (lastSide.Count == 0)
                         {
-                            sides++;
+                            lastSide.Add((-99999, -99999));
+                        }
+
+                        if (positions.Count == 0
+                            || row[i].x - lastSide.Last().x > 1)
+                        {
+                            positions.Add((row[i].x, row[i].y + 1));
+                        }
+                        else
+                        {
+                            var index = positions.FindIndex(x => x == lastSide[^1]);
+                            positions[index] = (row[i].x, row[i].y + 1);
+                        }
+
+                    }
+                    //DOWN
+                    if (row[i].x + 1 >= map[0].Count || map[row[i].x + 1][row[i].y] != id)
+                    {
+                        var positions = directionSide["DOWN"];
+                        List<(int x, int y)> lastSide = positions.Where(pos => pos.x == row[i].x + 1).ToList();
+                        if (lastSide.Count == 0)
+                        {
+                            lastSide.Add((-99999, -99999));
+                        }
+
+                        if (positions.Count == 0 
+                            || row[i].y - lastSide.Last().y > 1)
+                        {
+                            positions.Add((row[i].x + 1, row[i].y));
+                        }
+                        else
+                        {
+                            var index = positions.FindIndex(x => x == lastSide[^1]);
+                            positions[index] = (row[i].x + 1, row[i].y);
                         }
                     }
+                    //LEFT
+                    if (row[i].y - 1 < 0 || map[row[i].x][row[i].y - 1] != id)
+                    {
+                        var positions = directionSide["LEFT"];
+                        List<(int x, int y)> lastSide = positions.Where(pos => pos.y == row[i].y - 1).ToList();
+                        if (lastSide.Count == 0)
+                        {
+                            lastSide.Add((-99999,-99999));
+                        }
+
+                        if (positions.Count == 0
+                            || row[i].x - lastSide[^1].x > 1)
+                        {
+                            positions.Add((row[i].x, row[i].y - 1));
+                        }
+                        else
+                        {
+                            var index = positions.FindIndex(x => x == lastSide[^1]);
+                            positions[index] = (row[i].x, row[i].y - 1);
+                        }
+                    }
+
+
                 }
             }
 
+            foreach (var item in directionSide)
+            {
+                sides += item.Value.Count;
+            }
 
 
-            return sides;
+            return directionSide.Sum(x => x.Value.Count);
         }
 
         static int CalculatePerimeter(List<(int x, int y)> region, char id)
